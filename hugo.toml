@@ -16,8 +16,8 @@ paginate = 10
   ShowBreadCrumbs = true
 
 [params.homeInfoParams]
-  Title = "Field Notes"
-  Content = "Writing on cloud engineering, AI infrastructure, and platform thinking."
+  Title = "Hey, I'm Anthony."
+  Content = "Cloud engineering leader, tinkerer, and occasional writer. Field Notes is where I explore things in tech I find interesting — not always cloud, not always AI, just stuff worth digging into. Pull up a post."
 
 [[params.socialIcons]]
   name = "email"
@@ -25,7 +25,7 @@ paginate = 10
 
 [[params.socialIcons]]
   name = "linkedin"
-  url = "https://linkedin.com/in/anthony-mineer"
+  url = "https://www.linkedin.com/in/anthony-m-73127650/"
 
 [menu]
   [[menu.main]]
