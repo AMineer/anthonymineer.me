@@ -1,4 +1,4 @@
 ---
-title: "Field Notes"
-description: "Writing on cloud engineering, AI infrastructure, and platform thinking."
+title: "Notes from the Field"
+description: "Writing on Cloud Engineering, AI infrastructure, and Platform thinking."
 ---
