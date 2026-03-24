@@ -1,0 +1,46 @@
+baseURL = "https://amineer.github.io/anthonymineer.me/"
+languageCode = "en-us"
+title = "Anthony Mineer"
+theme = "PaperMod"
+enableRobotsTXT = true
+enableEmoji = true
+paginate = 10
+
+[params]
+  author = "Anthony Mineer"
+  description = "Cloud engineering, AI infrastructure, and platform thinking."
+  defaultTheme = "auto"
+  ShowReadingTime = true
+  ShowCodeCopyButtons = true
+  ShowPostNavLinks = true
+  ShowBreadCrumbs = true
+
+[params.homeInfoParams]
+  Title = "Field Notes"
+  Content = "Writing on cloud engineering, AI infrastructure, and platform thinking."
+
+[[params.socialIcons]]
+  name = "email"
+  url = "mailto:am@anthonymineer.me"
+
+[[params.socialIcons]]
+  name = "linkedin"
+  url = "https://linkedin.com/in/anthony-mineer"
+
+[menu]
+  [[menu.main]]
+    name = "Field Notes"
+    url = "/field-notes/"
+    weight = 1
+  [[menu.main]]
+    name = "About"
+    url = "/about/"
+    weight = 2
+  [[menu.main]]
+    name = "Contact"
+    url = "/contact/"
+    weight = 3
+
+[taxonomies]
+  tag = "tags"
+  series = "series"
