@@ -10,18 +10,6 @@ Cloud engineering, AI infrastructure, and platform thinking.
 - **Theme:** PaperMod
 - **Hosting:** GitHub Pages
 
-## Local Development
-
-**Prerequisites:** [Hugo](https://gohugo.io/installation/) installed
-
-```bash
-git clone https://github.com/AMineer/anthonymineer.me.git
-cd anthonymineer.me
-hugo server -D
-```
-
-The site will be available at `http://localhost:1313`.
-
 ## Content
 
 Posts live under `content/field-notes/`. New posts follow the Hugo front matter convention:
