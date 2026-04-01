@@ -1,13 +1,13 @@
 ---
 title: "The API in Front of the AI: Part 2"
 description: "Build a local MCP server in Node.js, wire it into Bifrost, and let qwen3.5 use your own machine's tools — all offline, all free."
-date: 2026-03-24
+date: 2026-03-31
 tags: ["ai", "llm", "mcp", "bifrost", "ollama", "local-lab", "cloud-engineering"]
 series: ["LLM Gateways"]
 series_order: 2
 showToc: true
 TocOpen: false
-draft: true
+draft: false
 ---
 
 *Filed under: Cloud Engineering · AI Infrastructure · Local Lab*
