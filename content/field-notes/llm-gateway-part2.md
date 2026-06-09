@@ -1,6 +1,6 @@
 ---
 title: "The API in Front of the AI: Part 2"
-description: "Build a local MCP server in Node.js, wire it into Bifrost, and let qwen3.5 use your own machine's tools — all offline, all free."
+description: "A local MCP server in Node.js, wired into Bifrost, giving qwen3.5 access to your own machine's tools. Offline and free."
 date: 2026-03-31
 tags: ["ai", "llm", "mcp", "bifrost", "ollama", "local-lab", "cloud-engineering"]
 series: ["LLM Gateways"]
@@ -14,52 +14,48 @@ draft: false
 
 ---
 
-## Picking Up Where We Left Off
+## Where Part 1 left off
 
-In [Part 1](/field-notes/llm-gateway-part1/), we got Bifrost running locally on your Mac, wired up Ollama with qwen3.5, and verified the whole stack was humming. Requests flowing through the gateway, streaming working, tool calling confirmed.
+In [Part 1](/field-notes/llm-gateway-part1/) we got Bifrost running locally, wired up Ollama with qwen3.5, and confirmed the stack end to end. Requests through the gateway, streaming, tool calling.
 
-Now we're going deeper.
-
-This post is about MCP — the Model Context Protocol. If Part 1 was about giving your AI a reliable phone line, Part 2 is about giving it hands. By the end you'll have a local MCP server running on your machine that exposes real tools, connected through Bifrost, so qwen3.5 can actually *do things* on your behalf, check system info, run safe shell commands, do math, all without touching the cloud.
+This post adds MCP, the Model Context Protocol. Part 1 gave the model a reliable connection. This part gives it tools. By the end you'll have a local MCP server exposing real capabilities (system info, allowlisted shell commands, math) connected through Bifrost so qwen3.5 can run them. Still no cloud.
 
 ---
 
-## What Is MCP?
+## What MCP is
 
-MCP stands for Model Context Protocol. It's an open standard, originally released by Anthropic in late 2024 and now governed by the Linux Foundation, that defines how AI models discover and call external tools and data sources.
+Model Context Protocol is an open standard, released by Anthropic in late 2024 and now under the Linux Foundation, that defines how models discover and call external tools and data sources.
 
-Before MCP, every AI framework had its own tool integration format. OpenAI's function calling, LangChain's tool abstraction, Anthropic's tool use spec — they all solved the same problem differently. If you wanted your database lookup to work with multiple AI clients, you wrote multiple integrations.
+Before it, every framework had its own tool format. OpenAI function calling, LangChain's tool abstraction, Anthropic's tool use spec all solved the same problem differently. Supporting multiple clients meant writing multiple integrations.
 
-MCP fixes that. Write one server, and any MCP-compatible client can use it — Claude Desktop, your own agent, Bifrost, whatever. It's the USB-C moment for AI tooling.
+MCP collapses that to one. Write a server once and any MCP-compatible client can use it: Claude Desktop, your own agent, Bifrost, anything.
 
-There are two transport modes worth knowing:
+Two transport modes matter here:
 
-- **stdio** — local, process-to-process communication via stdin/stdout. The gateway spawns your script as a subprocess. No ports, no networking, no auth needed. This is what we're building today.
-- **HTTP/SSE** — remote, for servers others connect to over a network. That's a future post.
+- **stdio.** Local, process-to-process over stdin/stdout. The gateway spawns your script as a subprocess. No ports, no networking, no auth. This is what we're building.
+- **HTTP/SSE.** Remote, for servers others reach over a network. Another post.
 
 ---
 
-## The Architecture
-
-The flow looks like this:
+## The architecture
 
 ```
 Your app → Bifrost (port 8080) → spawns MCP server via stdio → tool runs locally → result returned
 ```
 
-Bifrost acts as both the LLM gateway *and* the MCP client. It spawns your local MCP server process, hands it tool requests from qwen3.5, and passes results back. Your app never needs to know any of this is happening — it just sends a chat request and gets a response back that includes tool results.
+Bifrost is both the LLM gateway and the MCP client. It spawns your server process, hands it tool requests from qwen3.5, and passes results back. The app just sends a chat request and gets a response that includes the tool results.
 
 ---
 
 ## Prerequisites
 
-You need everything from Part 1 still running:
+Everything from Part 1 still running:
 
 - Node.js 18+ (`node --version`)
-- Ollama running with qwen3.5 (`ollama serve`)
-- Bifrost running (`npx -y @maximhq/bifrost`)
+- Ollama with qwen3.5 (`ollama serve`)
+- Bifrost (`npx -y @maximhq/bifrost`)
 
-Plus one new package — the official MCP SDK:
+Plus the MCP SDK:
 
 ```bash
 mkdir ~/my-local-mcp && cd ~/my-local-mcp
@@ -67,7 +63,7 @@ npm init -y
 npm install @modelcontextprotocol/sdk zod
 ```
 
-Update `package.json` to add `"type": "module"` so we can use ES module syntax:
+Add `"type": "module"` to `package.json` for ES module syntax:
 
 ```json
 {
@@ -83,9 +79,9 @@ Update `package.json` to add `"type": "module"` so we can use ES module syntax:
 
 ---
 
-## Step 1: Build the MCP Server
+## Step 1: Build the server
 
-Create `server.js` in your `~/my-local-mcp/` folder:
+Create `server.js` in `~/my-local-mcp/`:
 
 ```js
 #!/usr/bin/env node
@@ -164,39 +160,36 @@ server.tool(
   }
 );
 
-// ⚠️ Critical: NEVER use console.log() in a stdio MCP server
-// It writes to stdout and corrupts the JSON-RPC stream
-// Always use console.error() for any debug output
+// Critical: never use console.log() in a stdio MCP server.
+// It writes to stdout, the same pipe the JSON-RPC stream uses, and corrupts it.
+// Use console.error() for any debug output.
 const transport = new StdioServerTransport();
 await server.connect(transport);
 console.error("MCP server running on stdio");
 ```
 
-Three tools exposed:
-- `get_system_info` — reads OS, CPU, memory stats from your machine
-- `run_command` — runs safe, allowlisted shell commands
-- `calculator` — basic arithmetic
+Three tools: `get_system_info` reads OS, CPU, and memory stats; `run_command` runs allowlisted shell commands; `calculator` does arithmetic.
 
-> **The one rule you cannot break with stdio servers:** never use `console.log()`. It writes to stdout, which is the same pipe the MCP protocol uses for JSON-RPC messages. One stray `console.log()` will corrupt the stream and silently break everything. Use `console.error()` for all debug output — it goes to stderr instead.
+> The one rule you can't break with stdio servers: never `console.log()`. It writes to stdout, which is the same pipe MCP uses for JSON-RPC. One stray log call corrupts the stream and breaks everything silently. Send all debug output to stderr with `console.error()`.
 
 ---
 
-## Step 2: Test the Server in Isolation
+## Step 2: Test the server alone
 
-Before connecting it to Bifrost, verify it works on its own using the MCP Inspector:
+Before touching Bifrost, verify the server works on its own with the MCP Inspector:
 
 ```bash
 cd ~/my-local-mcp
 npx @modelcontextprotocol/inspector node server.js
 ```
 
-This opens a browser UI at `localhost:5173` where you can call each tool interactively and see the raw JSON responses. If `get_system_info` returns your machine's stats and `calculator` returns correct math — your server is good.
+That opens a UI at `localhost:5173` where you can call each tool and inspect the raw JSON. If `get_system_info` returns your stats and `calculator` does the math, the server is good.
 
 ---
 
-## Step 3: Register the MCP Server in Bifrost
+## Step 3: Register the server in Bifrost
 
-Make sure Bifrost is running, then register your local server via the API:
+With Bifrost running, register the server via the API:
 
 ```bash
 curl -X POST http://localhost:8080/api/mcp/client \
@@ -211,16 +204,16 @@ curl -X POST http://localhost:8080/api/mcp/client \
   }'
 ```
 
-Replace `/Users/YOUR_USERNAME/my-local-mcp/server.js` with the actual absolute path to your file. You can get it by running `pwd` inside the `my-local-mcp` folder.
+Replace the path with your absolute path (run `pwd` in the `my-local-mcp` folder to get it).
 
-Alternatively, add it through the Bifrost web UI at `http://localhost:8080`:
+Or use the web UI at `http://localhost:8080`:
 
-1. Go to **MCP Clients** in the sidebar
-2. Click **Add MCP Client**
-3. Set connection type to **stdio**
-4. Set command to `node` and args to the full path of your `server.js`
+1. **MCP Clients** in the sidebar
+2. **Add MCP Client**
+3. Connection type **stdio**
+4. Command `node`, args set to the full path of `server.js`
 
-Verify Bifrost picked it up:
+Confirm Bifrost registered it:
 
 ```bash
 curl http://localhost:8080/api/mcp/clients
@@ -230,11 +223,11 @@ You should see `local-host-tools` in the response.
 
 ---
 
-## Step 4: Let qwen3.5 Use Your Tools
+## Step 4: Let qwen3.5 use the tools
 
-Now the fun part. Send a request that lets qwen3.5 reach for your local tools:
+Send requests that let the model reach for your local tools.
 
-### Ask about your machine
+### Ask about the machine
 
 ```bash
 curl -X POST http://localhost:8080/v1/chat/completions \
@@ -276,32 +269,30 @@ curl -X POST http://localhost:8080/v1/chat/completions \
   }'
 ```
 
-qwen3.5 will reason about which tool to use, call it through Bifrost, get the result, and incorporate it into its response — all running completely locally, no internet required.
+qwen3.5 reasons about which tool to use, calls it through Bifrost, gets the result, and folds it into the response. All local.
 
 ---
 
-## What Just Happened?
-
-Let's be clear about what's actually going on here because it's worth appreciating:
+## What happened on that last call
 
 1. Your app sent a plain chat request to Bifrost
-2. Bifrost forwarded it to qwen3.5 via Ollama with the available tool schemas attached
-3. qwen3.5 decided which tool to call and with what arguments
-4. Bifrost spawned your `server.js` subprocess and sent it the tool call over stdio
-5. Your server ran the tool, returned the result
+2. Bifrost forwarded it to qwen3.5 via Ollama with the tool schemas attached
+3. qwen3.5 picked a tool and its arguments
+4. Bifrost spawned `server.js` and sent it the tool call over stdio
+5. The server ran the tool and returned the result
 6. Bifrost handed the result back to qwen3.5
-7. qwen3.5 incorporated the result into a natural language response
+7. qwen3.5 wrote a natural language response around it
 8. Your app got back a normal chat response
 
-Every step of that happened on your laptop. No cloud. No API keys. No data leaving your machine.
+Every step ran on your laptop. Nothing left the machine.
 
 ---
 
-## Extending Your MCP Server
+## Extending the server
 
-This is where it gets interesting for real use cases. The pattern scales to anything you can write a function for. A few ideas that make sense for a home lab:
+The pattern scales to anything you can write a function for. A few that earn their place in a home lab:
 
-**Check which Ollama models are loaded:**
+**List loaded Ollama models:**
 
 ```js
 server.tool(
@@ -315,7 +306,7 @@ server.tool(
 );
 ```
 
-**Read a local file:**
+**Read a local file** (add `import fs from "fs";` to the top of `server.js` alongside the other imports):
 
 ```js
 server.tool(
@@ -329,7 +320,7 @@ server.tool(
 );
 ```
 
-**Hit a local API or service:**
+**Hit a local service:**
 
 ```js
 server.tool(
@@ -344,22 +335,22 @@ server.tool(
 );
 ```
 
-The sky's the limit. Any tool you can wrap in a function, you can expose to your local AI.
+Anything you can wrap in a function, you can expose to the model.
 
 ---
 
-## What's Next
+## What's next
 
-We've now built a complete local AI stack from scratch:
+The full local stack is built:
 
-- **Bifrost** as the gateway — routing, observability, fallbacks
-- **Ollama + qwen3.5** as the model — offline, free, surprisingly capable
-- **MCP** as the tool layer — giving the model real access to your environment
+- **Bifrost** for routing, observability, and fallbacks
+- **Ollama + qwen3.5** as the model, offline and free
+- **MCP** as the tool layer with real access to your environment
 
-The natural next steps from here are building HTTP-based MCP servers (so tools can be shared across machines or teams), exploring multi-agent patterns where one model orchestrates others, and looking at how this same architecture maps to production — because the patterns are identical, just at a different scale.
+From here the natural directions are HTTP-based MCP servers so tools can be shared across machines, multi-agent patterns where one model orchestrates others, and mapping this same shape to production. The patterns hold at scale, the numbers just get bigger.
 
-More field notes coming. In the meantime — go build something and break things.
+More notes coming.
 
 ---
 
-*Anthony Mineer is a Senior Manager of Cloud Engineering writing about cloud infrastructure, AI, and platform engineering at [anthonymineer.me](https://anthonymineer.me).*
+*Anthony Mineer · [anthonymineer.me](https://anthonymineer.me)*
