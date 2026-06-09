@@ -4,41 +4,39 @@ showToc: false
 draft: false
 ---
 
-Hey, I'm Anthony — a Cloud Engineering leader based in Ohio with 15+ years of experience keeping enterprise technology humming across some pretty complex environments.
+Hey, I'm Anthony. I lead cloud engineering and operations for a large healthcare org, and I've spent 15+ years figuring out how technology works and how to make it work better.
 
-My official title is Sr. Manager of Cloud Operations & Engineering, but the honest description is that I lead the catch-all team. We're officially called cloud engineering, but in practice we cover cloud platforms, DevOps, systems infrastructure, VDI, identity, and everything in between. The job, in short, is keeping the clouds from raining.
+I love what I do, and every so often I think about young me taking that first leap into IT and want to give him a pat on the back. It worked out.
 
 ---
 
 ## Field Notes
 
-This site is where I write about things I'm genuinely curious about. Not always cloud. Not always AI. Just tech I'm exploring, tools I'm tinkering with, and ideas I want to think through out loud.
+This site exists because I like building things, and I learn better when I have to write it down.
 
-If something ends up in a Field Notes post, it's because I found it interesting enough to dig in and share — whether that's a deep dive on LLM gateways, a lab I built on my Mac over a weekend, or an Azure architecture pattern that solved a real problem.
+Most of what ends up here started as a weekend project or a question I couldn't stop poking at. A local LLM gateway running on my Mac. An MCP server I wired up to see if I could. An Azure pattern that finally solved something annoying at work. If it was interesting enough to dig into, it's interesting enough to write up.
 
-No agenda. No sponsored content. Just field notes from the work.
+A lot of it is built to run cheap or free on hardware I already own. Half the fun is seeing how far you can get without a cloud bill.
 
 ---
 
 ## Background
 
-I've been in IT long enough to have racked servers, managed help desks, engineered endpoints at scale, and eventually landed in cloud architecture and engineering leadership. The through-line has always been the same: figure out how things actually work, and make them work better.
+I started in the Army as a 25Q, which is a fancy way of saying I kept communications gear working when it really mattered. That's where I got hooked on making complicated systems behave.
 
-Before cloud was cloud, I cut my teeth managing large-scale endpoint environments, building VDI platforms, and automating everything I could get my hands on with PowerShell. These days the problems are bigger and the blast radius is wider, but the approach is the same.
-
-I also carry a US Army background — trained as a 25Q, which is where I first learned that good systems and clear communication are the same problem wearing different clothes.
+From there it was the usual climb. Help desk, endpoints, VDI, a lot of PowerShell to avoid doing the same thing twice, and eventually cloud architecture and the engineering leadership I do now. The tools keep changing and the stakes keep getting higher, but the part I enjoy is the same as it was on day one: take something tangled, learn how it really works, and leave it better than I found it.
 
 ---
 
 ## Outside the Terminal
 
-Family man first. I've got a great wife, kids, and a couple of dogs who have strong opinions about when it's time to stop working. When I'm not in front of a screen I'm usually somewhere outdoors, or dragging the family through Disney or Universal for the dozenth time and somehow still enjoying it.
+Family comes first. Wife, kids, and a couple of dogs who make it clear when the workday should be over. When I'm not at a screen I'm usually outside, digging through a crate of records, or back at Disney or Universal with the family for the umpteenth time.
 
 ---
 
 ## Let's Connect
 
-If something I wrote was useful, sparked a question, or you just want to trade notes on something in the field — I'm always happy to connect.
+If something here was useful or you want to compare notes, reach out.
 
-📧 [am@anthonymineer.me](mailto:am@anthonymineer.me)
-🔗 [LinkedIn](https://www.linkedin.com/in/anthony-m-73127650/)
+[am@anthonymineer.me](mailto:am@anthonymineer.me)
+[LinkedIn](https://www.linkedin.com/in/anthony-m-73127650/)
