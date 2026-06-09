@@ -21,7 +21,7 @@ It leans on Ollama, which means zero cost and zero keys. The counts come straigh
 python token_counter.py agent.py --model gemma3:4b qwen3.5:latest
 ```
 
-![Same agent.py counted across two models](agent-comparison.png)
+![Same agent.py counted across two models](/agent-comparison.png)
 
 Eighty-two tokens on Gemma, seventy-four on Qwen. Same file. That gap is the whole point.
 
@@ -31,7 +31,7 @@ It also takes piped input if you just want to check a quick prompt:
 echo "your prompt here" | python token_counter.py --model gemma3:4b
 ```
 
-![Counting a piped prompt](stdin-example.png)
+![Counting a piped prompt](/stdin-example.png)
 
 A small touch I'm glad I added: for `.py` files it pulls out the actual prompt strings instead of counting the whole source file. You care about what the model sees, not your import statements.
 
