@@ -20,7 +20,7 @@ In [Part 1](/field-notes/llm-gateway-part1/), we got Bifrost running locally on 
 
 Now we're going deeper.
 
-This post is about MCP — the Model Context Protocol. If Part 1 was about giving your AI a reliable phone line, Part 2 is about giving it hands. By the end you'll have a local MCP server running on your machine that exposes real tools, connected through Bifrost, so qwen3.5 can actually *do things* on your behalf — check system info, run safe shell commands, do math — all without touching the cloud.
+This post is about MCP — the Model Context Protocol. If Part 1 was about giving your AI a reliable phone line, Part 2 is about giving it hands. By the end you'll have a local MCP server running on your machine that exposes real tools, connected through Bifrost, so qwen3.5 can actually *do things* on your behalf, check system info, run safe shell commands, do math, all without touching the cloud.
 
 ---
 
