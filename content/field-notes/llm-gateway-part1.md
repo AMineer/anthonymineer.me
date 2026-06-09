@@ -1,6 +1,6 @@
 ---
 title: "The API in Front of the AI"
-description: "Build a fully local LLM gateway lab on your Mac with Bifrost and Ollama qwen3.5. Zero cloud, zero cost, zero copy-paste."
+description: "Standing up a local LLM gateway with Bifrost and Ollama qwen3.5. No cloud, no keys, no bill."
 date: 2026-03-24
 tags: ["ai", "llm", "bifrost", "ollama", "local-lab", "cloud-engineering"]
 series: ["LLM Gateways"]
@@ -16,70 +16,42 @@ draft: false
 
 ---
 
-## You've Got APIs. Now You've Got AI APIs. Now What?
+## The problem
 
-Picture this: you grab an Ollama model, wire it into your app locally — done. Celebrate. But two months later? You've got five apps, a handful of models, and absolutely no visibility into what's being called, how often, or what it's costing you in compute. Sound familiar?
+You wire an Ollama model into an app and it works. A couple months later you've got five apps, a few models, and no idea what's calling what, how often, or what it's doing to your GPU.
 
-Welcome to the reason LLM gateways exist. This is Part 1 of a two-part Field Notes series. Here we cover what an LLM gateway is, why you'd want one, and how to get Bifrost running locally on your Mac against Ollama with qwen3.5 — fully offline, fully free, fully yours.
-
----
-
-## So… What Even Is an LLM Gateway?
-
-Think of an LLM gateway as the **air traffic control tower** for your AI requests.
-
-Every time your app wants to talk to a language model, that request flies through the gateway first. The gateway decides where to send it, who is allowed to send it, how much it costs, and whether it should be cached, retried, or blocked outright.
-
-**Non-techy version:** it's a smart switchboard that sits between your apps and every AI model on your machine (or the planet), speaking everyone's language and keeping receipts.
-
-**Techy version:** it's an OpenAI-compatible reverse proxy that normalizes request and response formats across providers, enforcing auth, rate limits, routing logic, cost tracking, and observability — all in one place.
+That's the gap an LLM gateway fills. This is Part 1 of a two-part series. Here we cover what a gateway does, why it's worth running, and how to get Bifrost talking to Ollama qwen3.5 on your Mac. Fully local.
 
 ---
 
-## Why Do You Need One?
+## What a gateway actually does
 
-### 🔑 One virtual key to rule them all
+It's an OpenAI-compatible reverse proxy that sits between your apps and your models. Every request goes through it first. It normalizes request and response formats across providers and gives you one place to handle auth, routing, rate limits, cost tracking, and logging.
 
-Without a gateway, every app talks directly to every model. With a gateway, your apps get virtual keys from the gateway itself. Rotate or revoke in one place — every downstream app is covered.
+Concretely, that buys you:
 
-### 🔀 Provider flexibility without code changes
-
-Want to swap from qwen3.5 to llama3.2 for a specific workload? That's a config change, not a code deployment. Your app cannot tell the difference.
-
-### 💸 Spend and usage tracking
-
-Even with local models you want to know which apps are hammering your GPU, how many tokens are flowing, and which requests are slowest. Gateways give you that visibility out of the box.
-
-### 🔄 Automatic fallback and load balancing
-
-What happens when your primary model is busy or unavailable? Define a fallback chain: try qwen3.5 → if that fails, try llama3.2. The gateway handles it automatically — no retry logic in your app.
-
-### 💬 Semantic caching
-
-If ten requests ask essentially the same question within a short window, should you run the model ten times? Semantic caching returns the cached response instantly for similar queries, slashing redundant compute.
-
-### 🔭 Observability
-
-Logs, latency per model, request counts, error rates — all the stuff you'll eventually want a dashboard for. Gateways plug this in as middleware so you don't have to instrument every app.
+- **One key surface.** Apps get virtual keys from the gateway instead of talking to each model directly. Rotate or revoke in one place.
+- **Provider swaps without redeploys.** Moving a workload from qwen3.5 to llama3.2 is a config change. The app doesn't know.
+- **Usage visibility.** Token counts, request volume, and latency per model, even for local models hammering your hardware.
+- **Fallback chains.** Primary busy or down? Define qwen3.5 then llama3.2 and let the gateway handle the retry. No logic in your app.
+- **Semantic caching.** Near-identical prompts return a cached response instead of re-running the model.
+- **Observability as middleware.** Logs, latency, error rates without instrumenting every app.
 
 ---
 
-## Why Bifrost for a Local Lab?
+## Why Bifrost
 
-There are several solid open-source LLM gateways out there. For a local lab environment, Bifrost hits the sweet spot:
+A few open-source gateways do this well. Bifrost fits a local lab for a few reasons:
 
-- **Zero-config startup.** One `npx` command and you have a running gateway with a web UI. No YAML required to get started.
-- **Built in Go.** Lightweight, fast, and doesn't need a Python environment or virtual env to manage.
-- **Web UI included.** Add providers, configure keys, and watch requests flow through a dashboard at `localhost:8080`.
-- **OpenAI-compatible.** Any SDK or tool that works with OpenAI works with Bifrost. One line change in your app.
-- **Ollama support.** Bifrost treats Ollama as a first-class provider. Point it at `localhost:11434` and you're done.
-- **Free and open source.** Apache 2.0 license. Self-host forever at no cost.
+- One `npx` command and you have a running gateway with a web UI. No YAML to start.
+- Written in Go, so no Python env to babysit.
+- Treats Ollama as a first-class provider. Point it at `localhost:11434` and you're done.
+- OpenAI-compatible, so any SDK that talks to OpenAI talks to Bifrost with a base URL change.
+- Apache 2.0. Self-host for free.
 
 ---
 
 ## Prerequisites
-
-Before we start, make sure you have the following on your Mac:
 
 | Tool | Version | Install |
 |---|---|---|
@@ -88,19 +60,19 @@ Before we start, make sure you have the following on your Mac:
 | qwen3.5:latest | 6.6 GB | `ollama pull qwen3.5:latest` |
 | Docker (optional) | Latest | [docs.docker.com](https://docs.docker.com) |
 
-Verify everything is ready:
+Confirm the basics:
 
 ```bash
-node --version       # should show v18 or higher
-ollama list          # should show qwen3.5:latest
-ollama serve         # start Ollama if not already running
+node --version       # v18+
+ollama list          # should list qwen3.5:latest
+ollama serve         # start it if it isn't running
 ```
 
 ---
 
-## Step 1: Verify Ollama is Running
+## Step 1: Confirm Ollama responds
 
-Before adding a gateway, confirm qwen3.5 responds on its own:
+Before adding anything in front of it, make sure qwen3.5 answers on its own:
 
 ```bash
 curl http://localhost:11434/api/chat \
@@ -111,32 +83,28 @@ curl http://localhost:11434/api/chat \
   }'
 ```
 
-You should get a JSON response with the model's reply. If not, run `ollama serve` in a terminal first.
+If you get JSON back, you're good. If not, run `ollama serve` first.
 
 ---
 
 ## Step 2: Start Bifrost
 
-### Option A — npx (fastest)
-
-Open a new terminal window and run:
+### npx
 
 ```bash
 npx -y @maximhq/bifrost
 ```
 
-Bifrost downloads a pre-compiled Go binary for your architecture (arm64 for M-series Macs) and starts immediately. You should see:
+Bifrost pulls a pre-compiled binary for your architecture (arm64 on M-series) and starts:
 
 ```
 Bifrost HTTP gateway starting...
 Web UI available at http://localhost:8080
 ```
 
-> **Tip:** The first npx run may take 15–30 seconds while the binary downloads. Subsequent starts are instant.
+First run takes 15 to 30 seconds for the download. After that it's instant.
 
-### Option B — Docker (with data persistence)
-
-If you prefer Docker and want your configuration to survive restarts:
+### Docker (if you want config to persist)
 
 ```bash
 docker run -p 8080:8080 \
@@ -144,23 +112,17 @@ docker run -p 8080:8080 \
   maximhq/bifrost
 ```
 
-The `-v $(pwd)/data:/app/data` flag persists your provider config and request logs to a local `./data` folder.
+The volume mount persists provider config and request logs to `./data`.
 
 ---
 
-## Step 3: Add Ollama as a Provider
+## Step 3: Register Ollama
 
-Open **http://localhost:8080** in your browser. Bifrost starts in UI-config mode — everything is configured through the web interface.
+Open **http://localhost:8080**. Bifrost starts in UI-config mode.
 
-In the Bifrost dashboard:
+In the dashboard: **Providers → Add Provider → Ollama**, set the base URL to `http://localhost:11434`, save. No key needed for local.
 
-1. Go to **Providers** in the sidebar
-2. Click **Add Provider**
-3. Select **Ollama** from the provider list
-4. Set the base URL to `http://localhost:11434`
-5. Save — no API key needed for local Ollama
-
-Alternatively, register it via the API:
+Or via the API:
 
 ```bash
 curl -X POST http://localhost:8080/api/providers \
@@ -174,9 +136,7 @@ curl -X POST http://localhost:8080/api/providers \
 
 ---
 
-## Step 4: Send Your First Request Through the Gateway
-
-With Bifrost running and Ollama registered, send a request through the gateway:
+## Step 4: First request through the gateway
 
 ```bash
 curl -X POST http://localhost:8080/v1/chat/completions \
@@ -187,17 +147,13 @@ curl -X POST http://localhost:8080/v1/chat/completions \
   }'
 ```
 
-You should get a full OpenAI-format response from qwen3.5, routed through Bifrost. Check the Bifrost dashboard — you'll see the request logged with latency, token count, and model used.
-
-> ✅ **You did it.** Your entire AI stack is now running locally. No cloud. No API keys. No bill at the end of the month.
+You get a standard OpenAI-format response, routed through Bifrost. The request shows up in the dashboard with latency, token count, and model.
 
 ---
 
-## Step 5: Run the Test Suite
+## Step 5: Validate it end to end
 
-Here are the key tests to validate your setup end-to-end.
-
-### Smoke test
+### Smoke
 
 ```bash
 curl -X POST http://localhost:8080/v1/chat/completions \
@@ -208,9 +164,9 @@ curl -X POST http://localhost:8080/v1/chat/completions \
   }'
 ```
 
-### Streaming test
+### Streaming
 
-Tokens should arrive word-by-word in your terminal:
+Tokens should arrive incrementally:
 
 ```bash
 curl -X POST http://localhost:8080/v1/chat/completions \
@@ -222,7 +178,7 @@ curl -X POST http://localhost:8080/v1/chat/completions \
   }'
 ```
 
-### System prompt test
+### System prompt
 
 ```bash
 curl -X POST http://localhost:8080/v1/chat/completions \
@@ -236,9 +192,9 @@ curl -X POST http://localhost:8080/v1/chat/completions \
   }'
 ```
 
-### Tool calling test
+### Tool calling
 
-qwen3.5 supports native tool calling. This verifies Bifrost passes tool schemas and the model returns structured output:
+qwen3.5 supports native tool calling. This checks that Bifrost passes the schema through and the model returns structured output:
 
 ```bash
 curl -X POST http://localhost:8080/v1/chat/completions \
@@ -266,9 +222,9 @@ curl -X POST http://localhost:8080/v1/chat/completions \
   }'
 ```
 
-### Concurrent load test
+### Concurrent load
 
-Fires 10 parallel requests — check the Bifrost dashboard afterward for latency stats:
+Ten parallel requests. Check the dashboard afterward for latency under load:
 
 ```bash
 for i in {1..10}; do
@@ -279,7 +235,7 @@ done
 wait && echo "All 10 requests completed"
 ```
 
-### Python SDK drop-in test
+### Python SDK drop-in
 
 ```python
 import openai
@@ -300,32 +256,32 @@ print(f"Tokens: {response.usage.total_tokens}")
 
 ---
 
-## Test Reference
+## Test reference
 
-| Test | What it validates |
+| Test | Validates |
 |---|---|
-| Smoke test | Gateway ↔ Ollama routing works |
-| Streaming | SSE passthrough works correctly |
-| System prompt | System role forwarded correctly |
-| Tool calling | Structured function output works |
-| Concurrent load | No dropped requests under parallel load |
-| Python SDK | Drop-in OpenAI replacement works end-to-end |
+| Smoke | Gateway to Ollama routing |
+| Streaming | SSE passthrough |
+| System prompt | System role forwarded |
+| Tool calling | Structured function output |
+| Concurrent load | No drops under parallel load |
+| Python SDK | Drop-in OpenAI replacement |
 
 ---
 
-## What's Next
+## Next
 
-You now have a fully functional local LLM gateway running on your Mac. qwen3.5 is serving requests through Bifrost with observability, routing, and zero cloud dependency.
+You've got a working local gateway. qwen3.5 is serving through Bifrost with logging, routing, and no cloud dependency.
 
-In **Part 2**, we'll go deeper: building a local MCP server that exposes your own machine's tools — system info, shell commands, custom APIs — and wiring it through Bifrost so qwen3.5 can actually *do things* on your behalf. That's where it gets really interesting.
+Part 2 goes further: a local MCP server exposing your own machine's tools (system info, shell, custom APIs) wired through Bifrost so qwen3.5 can actually run things for you.
 
-Until then, some things worth exploring in your new setup:
+Worth poking at before then:
 
-- Add a second local model (`ollama pull llama3.2`) and configure a fallback chain between them
-- Set a virtual key with a token budget and watch the gateway enforce it
-- Enable semantic caching in the Bifrost UI and run the same prompt twice — watch the second one come back instantly
-- Check `http://localhost:8080` after your test suite — the dashboard logs every request with latency and token counts
+- Pull a second model (`ollama pull llama3.2`) and set a fallback chain between the two
+- Give a virtual key a token budget and watch the gateway enforce it
+- Turn on semantic caching and run the same prompt twice
+- Check the dashboard after the test suite for per-request latency and token counts
 
 ---
 
-*Anthony Mineer is a Senior Manager of Cloud Engineering writing about cloud infrastructure, AI, and platform engineering at [anthonymineer.me](https://anthonymineer.me). Part 2: MCP Gateway Setup coming soon.*
+*[anthonymineer.me](https://anthonymineer.me). Part 2: llm-gateway-part2.*
