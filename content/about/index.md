@@ -4,7 +4,7 @@ showToc: false
 draft: false
 ---
 
-Hey, I'm Anthony. I lead cloud engineering and operations for a large healthcare org, and I've spent 15+ years figuring out how technology works and how to make it work better.
+Hey, I'm Anthony. I lead cloud engineering and operations for a large healthcare org, and I've spent 18+ years figuring out how technology works and how to make it work better.
 
 I love what I do, and every so often I think about young me taking that first leap into IT and want to give him a pat on the back. It worked out.
 
