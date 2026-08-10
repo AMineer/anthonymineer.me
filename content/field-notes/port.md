@@ -1,8 +1,8 @@
 ---
 title: "Building a Self-Service IDP on Port.io and GitLab CI/CD"
-date: 2026-07-22
+date: 2026-07-06
 tags: [platform-engineering, port-io, gitlab, gcp, terraform, idp]
-draft: true
+draft: false
 ---
 
 ## Why bother
