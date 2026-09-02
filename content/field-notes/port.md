@@ -25,6 +25,9 @@ The bucket action is the easy one to describe. Developer fills out a form in Por
 
 ```mermaid
 sequenceDiagram
+    accTitle: Self-service GCP resource provisioning
+    accDescr: A developer submits a request in Port, GitLab provisions the resource in GCP using federated authentication, and the result is reported back to the Port catalog.
+
     participant Dev as Developer
     participant Port as Port.io
     participant GL as GitLab CI/CD

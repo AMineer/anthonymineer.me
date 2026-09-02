@@ -7,9 +7,9 @@ draft: false
 
 ## Start here
 
-A few weeks ago I wrote an article about Port.io and some of its use cases. I realized that maybe I should also cover what an Internal Developer Platform or IDP for short is. So to get us kicked off we are going back to basics and exploring IDPS and their various flavors. 
+A few weeks ago I wrote an article about Port and some of its use cases. I realized that maybe I should also cover what an Internal Developer Platform, or IDP for short, is. So to get us kicked off, we are going back to basics and exploring IDPs and their various flavors.
 
-Internal Developer Platform is one of those terms that somehow gets less clear the more people use it.
+An Internal Developer Platform is one of those terms that somehow gets less clear the more people use it.
 
 Depending on who you ask, an IDP is Backstage. Or Port. Or Kubernetes. Or a collection of Terraform modules. Or a developer portal. Or a service catalog. Or the thing your platform team has been building for three years that nobody is quite sure how to explain.
 
@@ -19,7 +19,7 @@ There are plenty of formal definitions. The CNCF describes platforms broadly as 
 
 For the rest of this article, I am going to use a slightly more practical definition:
 
-**An Internal Developer Platform is the set of capabilities an engineering organization assembles so developers can build, deploy, and operate software through supported paths without needing to understand every implementation detail underneath them.**
+> **Working definition:** An Internal Developer Platform is the set of capabilities an engineering organization assembles so developers can build, deploy, and operate software through supported paths without needing to understand every implementation detail underneath them.
 
 The important part is "set of capabilities."
 
@@ -56,6 +56,9 @@ A simple version looks something like this:
 
 ```mermaid
 flowchart TD
+    accTitle: Developer portal and platform capabilities
+    accDescr: A developer uses a portal to access a service catalog, documentation, scorecards, self-service actions, and the underlying platform capabilities.
+
     Developer --> DeveloperPortal["Developer Portal"]
 
     DeveloperPortal --> ServiceCatalog["Service Catalog"]
@@ -103,7 +106,7 @@ That is useful.
 
 It is not the same thing as giving developers a self-service engineering platform.
 
-Before you build the catalog, define your nouns
+## Before you build the catalog, define your nouns
 
 There is a less exciting part of building an IDP that I think gets skipped far too often.
 
@@ -115,16 +118,16 @@ Ask ten engineering teams what a service is and you may get ten slightly differe
 
 Is a service:
 
-a Git repository?
-something independently deployable?
-a Kubernetes workload?
-an API?
-a business capability?
-a collection of workloads owned by the same team?
-a scheduled job?
-a data pipeline?
-a frontend?
-a third-party SaaS product your team operates?
+- A Git repository?
+- Something independently deployable?
+- A Kubernetes workload?
+- An API?
+- A business capability?
+- A collection of workloads owned by the same team?
+- A scheduled job?
+- A data pipeline?
+- A frontend?
+- A third-party SaaS product your team operates?
 
 This sounds semantic until you start building the data model.
 
@@ -140,21 +143,23 @@ Now take one application deployed into development, staging, and production.
 
 If every runtime instance becomes a service, you suddenly have three services when the engineering organization probably thinks it owns one.
 
-Neither model is inherently wrong.
-
-The problem is not making the decision intentionally.
+Neither model is inherently wrong. The problem is not making the decision intentionally.
 
 A useful starting definition might be:
 
-A service is a logical software capability with defined ownership and an independent operational lifecycle, which may be implemented by one or more repositories, workloads, APIs, and infrastructure resources.
+> **A useful starting point:** A service is a logical software capability with defined ownership and an independent operational lifecycle, which may be implemented by one or more repositories, workloads, APIs, and infrastructure resources.
 
 Your organization may choose something different.
 
 The exact sentence matters less than agreeing on it.
 
 Once that definition exists, the rest of the model starts getting much cleaner:
+
 ```mermaid
 graph TD
+    accTitle: Service data model
+    accDescr: A team owns a service that relates to repositories, APIs, pipelines, deployments, workloads, infrastructure, incidents, Jira work, and documentation.
+
     Team --> Service
 
     Service --> Repository
@@ -167,6 +172,7 @@ graph TD
     Service --> JiraWork["Jira Work"]
     Service --> Documentation
 ```
+
 Now a repository is not a service.
 
 A Kubernetes deployment is not a service.
@@ -199,88 +205,79 @@ The catalog is not just a collection of records.
 
 It is your organization's model of how software actually fits together.
 
-So what actually makes something an IDP?
+## What actually makes something an IDP?
 
 There is no official checklist, but useful IDPs tend to provide some combination of the same capabilities.
 
-Discovery
+### Discovery
 
 Developers can answer questions like:
 
-What services exist?
-Who owns this application?
-What repository is it in?
-Where is it deployed?
-What depends on it?
-Where are the dashboards?
-Is it meeting our engineering standards?
+- What services exist?
+- Who owns this application?
+- What repository is it in?
+- Where is it deployed?
+- What depends on it?
+- Where are the dashboards?
+- Is it meeting our engineering standards?
 
 This is where service catalogs are valuable.
 
-Self-service
+### Self-service
 
 Developers can request common capabilities without opening an infrastructure ticket.
 
 For example:
 
-Create cloud project
-Create storage bucket
-Create database
-Create repository
-Create Kubernetes namespace
-Deploy new service
-Request certificate
-Create DNS record
-Provision secrets
+- Create a cloud project
+- Create a storage bucket
+- Create a database
+- Create a repository
+- Create a Kubernetes namespace
+- Deploy a new service
+- Request a certificate
+- Create a DNS record
+- Provision secrets
 
 The key is that the platform does not just expose raw infrastructure.
 
 It provides an opinionated way to consume it.
 
-Standardization
+### Standardization
 
 The platform encodes organizational standards into the path developers use.
 
 A database request might automatically include:
 
-encryption
-backup policy
-tagging
-monitoring
-networking
-IAM
-cost ownership
+- Encryption
+- Backup policy
+- Tagging
+- Monitoring
+- Networking
+- IAM
+- Cost ownership
 
 The developer requests a database.
 
 The platform handles what a database means inside your company.
 
-Delivery
+### Delivery
 
 A mature platform usually extends beyond infrastructure provisioning into how applications actually reach production.
 
 That means things like:
+
+```mermaid
+flowchart TD
+    accTitle: Application delivery lifecycle
+    accDescr: Source code moves through build, test, artifact creation, deployment, and observation.
+
+    Source --> Build --> Test --> Artifact --> Deploy --> Observe
 ```
-Source
-  |
-  v
-Build
-  |
-  v
-Test
-  |
-  v
-Artifact
-  |
-  v
-Deploy
-  |
-  v
-Observe
-```
+
 The more of that path the platform can make predictable, the more useful it becomes.
 
-There is more than one flavor of IDP
+## There is more than one flavor of IDP
 
 This is where the conversation usually gets messy.
 
@@ -290,40 +287,44 @@ Neither one is necessarily wrong.
 
 IDPs tend to develop around whatever problem the organization was trying to solve first.
 
-Flavor 1: The developer portal
+### Flavor 1: The developer portal
 
 This is probably the easiest IDP to recognize.
 
 The organization starts with a portal or catalog and builds outward.
 
 Think:
+
+```mermaid
+flowchart TD
+    accTitle: Developer portal capabilities
+    accDescr: A portal organizes services, teams, documentation, dependencies, scorecards, and self-service actions.
+
+    Portal --> Services
+    Portal --> Teams
+    Portal --> Documentation
+    Portal --> Dependencies
+    Portal --> Scorecards
+    Portal --> SelfService["Self-Service Actions"]
 ```
-Portal
-  |
-  +-- Services
-  +-- Teams
-  +-- Documentation
-  +-- Dependencies
-  +-- Scorecards
-  +-- Self-Service Actions
-```
+
 Products like Port, Backstage, Cortex, OpsLevel, and others live in this space.
 
 The first win is usually visibility.
 
 Before the portal:
 
-Who owns payment-service?
+> **Who owns `payment-service`?**
+>
+> "I think Sarah's team."
 
-"I think Sarah's team."
+> **Where is the dashboard?**
+>
+> "Check the README."
 
-Where is the dashboard?
-
-"Check the README."
-
-Which cluster is it in?
-
-"Prod, probably."
+> **Which cluster is it in?**
+>
+> "Prod, probably."
 
 After the portal, that information becomes structured and searchable.
 
@@ -345,7 +346,7 @@ The failure mode is when the organization stops at the catalog.
 
 A beautifully organized list of services is useful, but nobody has ever shortened deployment lead time by making the links to Grafana easier to find.
 
-Flavor 2: The self-service infrastructure platform
+### Flavor 2: The self-service infrastructure platform
 
 This one usually grows out of Cloud Engineering or Infrastructure Engineering.
 
@@ -354,31 +355,25 @@ The original problem sounds something like:
 Developers keep opening tickets for infrastructure and the cloud team is becoming the world's most expensive request queue.
 
 So the platform team starts automating common requests.
+
+```mermaid
+flowchart TD
+    accTitle: Self-service cloud project workflow
+    accDescr: A developer requests a project through a platform workflow that uses Terraform to provision it in the cloud.
+
+    Developer --> CreateProject["Create Project"] --> PlatformWorkflow["Platform Workflow"] --> Terraform --> Cloud
 ```
-Developer
-    |
-    v
-"Create Project"
-    |
-    v
-Platform Workflow
-    |
-    v
-Terraform
-    |
-    v
-Cloud
-```
+
 The first capabilities are usually predictable:
 
-subscriptions, accounts, and projects
-storage
-databases
-network connectivity
-certificates
-IAM
-DNS
-Kubernetes namespaces
+- Subscriptions, accounts, and projects
+- Storage
+- Databases
+- Network connectivity
+- Certificates
+- IAM
+- DNS
+- Kubernetes namespaces
 
 This type of platform can provide enormous value very quickly.
 
@@ -392,100 +387,96 @@ A developer can have a perfectly provisioned cloud project and still spend the n
 
 That leads to the next flavor.
 
-Flavor 3: The application delivery platform
+### Flavor 3: The application delivery platform
 
 This is where the platform starts owning more of the path between source code and production.
 
 Instead of asking only:
 
-How do we let developers provision infrastructure?
+> How do we let developers provision infrastructure?
 
 the question becomes:
 
-How do we give developers a supported way to ship an application?
+> How do we give developers a supported way to ship an application?
 
 Now the IDP starts connecting systems like:
+
+```mermaid
+flowchart TD
+    accTitle: Application delivery platform
+    accDescr: Code moves from Git through continuous integration, an artifact registry, GitOps, the runtime, and observability.
+
+    Git --> CI --> ArtifactRegistry["Artifact Registry"] --> GitOps --> Runtime --> Observability
 ```
-Git
- |
- v
-CI
- |
- v
-Artifact Registry
- |
- v
-GitOps
- |
- v
-Runtime
- |
- v
-Observability
-```
+
 The platform may provide:
 
-repository templates
-standardized CI pipelines
-build containers
-artifact repositories
-Helm charts
-Argo CD applications
-deployment strategies
-secrets integration
-logging
-metrics
-tracing
-health checks
+- Repository templates
+- Standardized CI pipelines
+- Build containers
+- Artifact repositories
+- Helm charts
+- Argo CD applications
+- Deployment strategies
+- Secrets integration
+- Logging
+- Metrics
+- Tracing
+- Health checks
 
 This is also where golden paths become important.
 
 Instead of giving developers twelve tools and documentation explaining how to connect them, the platform gives them a supported path through the tools.
 
 For example:
+
+```mermaid
+flowchart TD
+    accTitle: Production API golden path
+    accDescr: Creating a production API generates a repository, CI template, Dockerfile, infrastructure, Helm chart, Argo application, logging, monitoring, and ownership metadata.
+
+    ProductionAPI["Create Production API"] --> Repository
+    ProductionAPI --> CITemplate["CI Template"]
+    ProductionAPI --> Dockerfile
+    ProductionAPI --> Infrastructure
+    ProductionAPI --> HelmChart["Helm Chart"]
+    ProductionAPI --> ArgoApplication["Argo Application"]
+    ProductionAPI --> Logging
+    ProductionAPI --> Monitoring
+    ProductionAPI --> OwnershipMetadata["Ownership Metadata"]
 ```
-Create Production API
-        |
-        +-- Repository
-        +-- CI Template
-        +-- Dockerfile
-        +-- Infrastructure
-        +-- Helm Chart
-        +-- Argo Application
-        +-- Logging
-        +-- Monitoring
-        +-- Ownership Metadata
-```
+
 The developer asks for an application.
 
 The platform turns that request into the organization's known-good implementation of one.
 
 That is a much more interesting abstraction than "click here to create a namespace."
 
-Flavor 4: The Kubernetes platform
+### Flavor 4: The Kubernetes platform
 
 Some organizations use Kubernetes itself as the primary platform abstraction.
 
 Instead of exposing cloud provider APIs directly, they expose higher-level APIs through Kubernetes.
 
 That might look like:
+
+```mermaid
+flowchart TD
+    accTitle: Kubernetes-based platform API
+    accDescr: A developer uses a platform API that exposes Kubernetes resources, Crossplane, operators, custom resources, and the underlying cloud runtime.
+
+    Developer --> PlatformAPI["Platform API"]
+    PlatformAPI --> KubernetesResources["Kubernetes Resources"]
+    PlatformAPI --> Crossplane
+    PlatformAPI --> Operators
+    PlatformAPI --> CustomResources["Custom Resources"]
+    PlatformAPI --> CloudRuntime["Cloud + Runtime"]
 ```
-Developer
-   |
-   v
-Platform API
-   |
-   +-- Kubernetes Resources
-   +-- Crossplane
-   +-- Operators
-   +-- Custom Resources
-   |
-   v
-Cloud + Runtime
-```
+
 Now a developer may request infrastructure by creating a Kubernetes object.
 
 Something like:
+
 ```yaml
 apiVersion: platform.company.io/v1
 kind: PostgresDatabase
@@ -495,17 +486,18 @@ spec:
   size: medium
   environment: production
 ```
+
 What actually happens underneath that object could be complicated.
 
 It might create:
 
-a managed database
-network rules
-DNS
-secrets
-monitoring
-backup configuration
-IAM
+- A managed database
+- Network rules
+- DNS
+- Secrets
+- Monitoring
+- Backup configuration
+- IAM
 
 The developer does not need to know.
 
@@ -525,7 +517,7 @@ A good platform hides complexity the developer does not need.
 
 A bad platform moves complexity somewhere less documented.
 
-Flavor 5: The platform-as-a-product IDP
+### Flavor 5: The platform-as-a-product IDP
 
 This one is less about technology and more about how the organization thinks.
 
@@ -535,11 +527,11 @@ The difference starts with the question being asked.
 
 An infrastructure team asks:
 
-What should we automate next?
+> What should we automate next?
 
 A platform product team asks:
 
-What is making it difficult for developers to deliver software?
+> What is making it difficult for developers to deliver software?
 
 Those questions can lead to very different backlogs.
 
@@ -557,39 +549,34 @@ That is why platform teams eventually need product metrics.
 
 Things like:
 
-Time to provision
-
-Time to first deployment
-
-Golden path adoption
-
-Self-service completion rate
-
-Manual intervention rate
-
-Deployment lead time
-
-Platform availability
-
-Developer satisfaction
-
-Configuration compliance
-
-Manual tickets avoided
+- Time to provision
+- Time to first deployment
+- Golden path adoption
+- Self-service completion rate
+- Manual intervention rate
+- Deployment lead time
+- Platform availability
+- Developer satisfaction
+- Configuration compliance
+- Manual tickets avoided
 
 The point is not measuring everything because dashboards are fun.
 
 The point is knowing whether the platform is actually making engineering easier.
 
-Most real platforms are hybrids
+## Most real platforms are hybrids
 
 This is probably the most important thing to understand.
 
 Very few mature IDPs fit neatly into one category.
 
 A real enterprise implementation might look like this:
+
 ```mermaid
 graph TD
+    accTitle: Hybrid Internal Developer Platform
+    accDescr: A portal provides a catalog, scorecards, and self-service actions that connect GitLab CI, Terraform, Argo CD, multiple clouds, and Kubernetes.
+
     Developer --> Portal
 
     Portal --> Catalog
@@ -610,11 +597,11 @@ graph TD
 ```
 That is simultaneously:
 
-a developer portal
-a cloud provisioning platform
-an application delivery platform
-a GitOps platform
-a governance platform
+- A developer portal
+- A cloud provisioning platform
+- An application delivery platform
+- A GitOps platform
+- A governance platform
 
 Trying to decide which one it "really" is misses the point.
 
@@ -622,7 +609,7 @@ The platform exists to provide capabilities.
 
 The architecture should follow the capabilities the organization needs.
 
-The data model may become the most valuable part
+## The data model may become the most valuable part
 
 There is another reason I think getting the data model right matters more than it first appears.
 
@@ -631,8 +618,12 @@ The catalog you are building is not just a catalog.
 Implemented properly, it starts becoming a context engine for your entire software organization.
 
 Think about what eventually gets connected to a service:
+
 ```mermaid
 graph TD
+    accTitle: Connected service context
+    accDescr: A service connects ownership, source code, delivery, runtime, infrastructure, incidents, work items, scorecards, cost, security, configuration, and observability.
+
     Team --> Service
     Repository --> Service
     Documentation --> Service
@@ -681,31 +672,16 @@ That changes the types of questions an AI tool can realistically answer.
 
 Instead of:
 
-Explain how Kubernetes readiness probes work.
+> Explain how Kubernetes readiness probes work.
 
 you can start asking:
 
-Why is payments-api unhealthy?
-
-Or:
-
-What changed immediately before this incident?
-
-Or:
-
-Which production services are currently out of sync in Argo?
-
-Or:
-
-Show me services with Terraform drift that also have an open production incident.
-
-Or:
-
-Which applications are failing our production-readiness standard, and what are they missing?
-
-And eventually:
-
-Create remediation work for every service that is missing the required deployment configuration.
+- Why is `payments-api` unhealthy?
+- What changed immediately before this incident?
+- Which production services are currently out of sync in Argo?
+- Show me services with Terraform drift that also have an open production incident.
+- Which applications are failing our production-readiness standard, and what are they missing?
+- Create remediation work for every service that is missing the required deployment configuration.
 
 That is a very different use of a developer platform.
 
@@ -714,8 +690,12 @@ The IDP starts as a way for humans to find and consume engineering capabilities.
 Over time, its data model can become the semantic layer that lets agents understand those same capabilities.
 
 The relationships are the important part.
+
 ```mermaid
 graph TD
+    accTitle: Service relationship graph
+    accDescr: A service relates to its owning team, source repository, Argo application, workload, database, dashboard, incidents, and scorecards.
+
     Service -->|owned by| Team
     Service -->|built from| Repository
     Service -->|deployed by| ArgoApplication["Argo Application"]
@@ -751,7 +731,7 @@ The portal may be what everyone sees.
 
 The context graph behind it may ultimately be the more valuable asset.
 
-Where golden paths fit
+## Where golden paths fit
 
 Golden paths deserve their own explanation because they are one of those ideas everyone agrees with right up until you ask what one actually is.
 
@@ -763,17 +743,17 @@ A golden path should encode the organization's preferred way to solve a problem 
 
 For example, the golden path for a production API might automatically include:
 
-Repository
-CI pipeline
-Container build
-Artifact registry
-Infrastructure
-Secrets
-Argo CD
-Observability
-Security scanning
-Ownership
-Cost metadata
+- Repository
+- CI pipeline
+- Container build
+- Artifact registry
+- Infrastructure
+- Secrets
+- Argo CD
+- Observability
+- Security scanning
+- Ownership
+- Cost metadata
 
 The developer still makes the decisions that matter to the application.
 
@@ -783,7 +763,7 @@ That is a healthy abstraction boundary.
 
 A golden path becomes much less useful when it turns into:
 
-Here are forty-seven mandatory fields required to use our simplified platform.
+> Here are forty-seven mandatory fields required to use our simplified platform.
 
 At that point the paved road has speed bumps every six feet.
 
@@ -791,7 +771,7 @@ The best golden paths are usually easier than going around them.
 
 That is what drives adoption.
 
-IDP does not mean no abstraction leaks
+## IDPs do not eliminate abstraction leaks
 
 One of the more dangerous promises around platform engineering is that developers will somehow stop needing to understand infrastructure.
 
@@ -803,59 +783,53 @@ The goal is to reduce the amount of infrastructure knowledge required for routin
 
 A developer probably should understand:
 
-CPU and memory
-scaling
-networking basics
-secrets
-application health
-deployment behavior
+- CPU and memory
+- Scaling
+- Networking basics
+- Secrets
+- Application health
+- Deployment behavior
 
 They probably should not need to understand:
 
-which Terraform backend your organization uses
-how your cloud landing zone is assembled
-what labels Finance requires
-which IAM role the pipeline assumes
-how your centralized DNS workflow operates
-which logging workspace their application belongs in
+- Which Terraform backend your organization uses
+- How your cloud landing zone is assembled
+- What labels Finance requires
+- Which IAM role the pipeline assumes
+- How your centralized DNS workflow operates
+- Which logging workspace their application belongs in
 
 Those are platform concerns.
 
 A good IDP creates an intentional boundary between the two.
 
-What an IDP is not
+## What an IDP is not
 
 This is probably the easiest way to wrap the definition up.
 
 An Internal Developer Platform is not automatically:
 
-A developer portal.
+A developer portal
+: A portal may be how developers interact with it.
 
-A portal may be how developers interact with it.
+Kubernetes
+: Kubernetes may be one of its runtime or API layers.
 
-Kubernetes.
+Terraform
+: Terraform may provision infrastructure behind it.
 
-Kubernetes may be one of its runtime or API layers.
+A service catalog
+: A catalog tells you what exists. A platform helps you do something with it.
 
-Terraform.
+CI/CD templates
+: They may be an important golden path, but delivery is only one capability.
 
-Terraform may provision infrastructure behind it.
-
-A service catalog.
-
-A catalog tells you what exists. A platform helps you do something with it.
-
-CI/CD templates.
-
-They may be an important golden path, but delivery is only one capability.
-
-A collection of automation scripts.
-
-Automation becomes a platform when it is offered as a consistent, supported capability instead of a folder full of shell scripts everyone is afraid to modify.
+A collection of automation scripts
+: Automation becomes a platform when it is offered as a consistent, supported capability instead of a folder full of shell scripts everyone is afraid to modify.
 
 And, probably most importantly:
 
-An IDP is not something you buy.
+> **An IDP is not something you buy.**
 
 You can buy a lot of the components.
 
@@ -869,7 +843,7 @@ But the platform is how those things are assembled around the way your engineeri
 
 That part is yours.
 
-So what is an IDP, really?
+## So what is an IDP, really?
 
 The easiest way I have found to think about it is this:
 
@@ -881,16 +855,17 @@ But the real objective is reducing the amount of organizational and technical kn
 
 If a developer can go from:
 
-I need a service
+> I need a service
 
 to:
 
-My service is running in production, follows our standards, is observable, has an owner, and can be operated by the team
-without opening six tickets and learning the internal structure of the cloud platform, the IDP is doing its job.
+> My service is running in production, follows our standards, is observable, has an owner, and can be operated by the team.
+
+If that happens without opening six tickets and learning the internal structure of the cloud platform, the IDP is doing its job.
 
 And if the same platform can answer:
 
-What is this service, who owns it, how is it deployed, what infrastructure supports it, is it healthy, and does it meet our standards?
+> What is this service, who owns it, how is it deployed, what infrastructure supports it, is it healthy, and does it meet our standards?
 
 then you have built something more valuable than a portal.
 
@@ -900,11 +875,10 @@ The harder question comes next.
 
 Because building the platform does not mean anyone will use it.
 
-And that is where a lot of IDP programs start to get interesting.
+And that is where IDP implementations get very interesting.
 
-Next in this thread: why Internal Developer Platforms fail, and why the portal is usually not the reason.
+## References
 
-References
-CNCF TAG App Delivery, Platforms Working Group, "Glossary"
-PlatformEngineering.org, platform engineering and Internal Developer Platform guidance
-Port documentation, data modeling, relationships, and software catalog concepts
+- CNCF TAG App Delivery, Platforms Working Group. “[Glossary](https://tag-app-delivery.cncf.io/wgs/platforms/glossary/)” — definitions for platforms, platform engineering, portals, capabilities, and golden paths.
+- Platform Engineering. “[What is platform engineering?](https://platformengineering.org/blog/what-is-platform-engineering)” — guidance on Internal Developer Platforms, developer self-service, and reducing cognitive load.
+- Port. “[Data model](https://docs.port.io/context-lake/data-model/configure-data-model/)” and “[Relate blueprints](https://docs.port.io/context-lake/data-model/setup-blueprint/relate-blueprints/)” — documentation for blueprints, catalog entities, and relationships.
