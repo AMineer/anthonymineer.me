@@ -78,7 +78,7 @@ Platform Capabilities
    +-- Observability
    +-- Security Policy
    +-- FinOps
-
+```
 If someone clicks "Create GCP Project" in a portal, the portal did not create the project.
 
 Something behind it did.
@@ -155,7 +155,7 @@ Your organization may choose something different.
 The exact sentence matters less than agreeing on it.
 
 Once that definition exists, the rest of the model starts getting much cleaner:
-
+```
 Team
   |
   v
@@ -178,7 +178,7 @@ Service
   +-- Jira Work
   |
   +-- Documentation
-
+```
 Now a repository is not a service.
 
 A Kubernetes deployment is not a service.
@@ -272,7 +272,7 @@ Delivery
 A mature platform usually extends beyond infrastructure provisioning into how applications actually reach production.
 
 That means things like:
-
+```
 Source
   |
   v
@@ -289,7 +289,7 @@ Deploy
   |
   v
 Observe
-
+```
 The more of that path the platform can make predictable, the more useful it becomes.
 
 There is more than one flavor of IDP
@@ -309,7 +309,7 @@ This is probably the easiest IDP to recognize.
 The organization starts with a portal or catalog and builds outward.
 
 Think:
-
+```
 Portal
   |
   +-- Services
@@ -318,7 +318,7 @@ Portal
   +-- Dependencies
   +-- Scorecards
   +-- Self-Service Actions
-
+```
 Products like Port, Backstage, Cortex, OpsLevel, and others live in this space.
 
 The first win is usually visibility.
@@ -366,7 +366,7 @@ The original problem sounds something like:
 Developers keep opening tickets for infrastructure and the cloud team is becoming the world's most expensive request queue.
 
 So the platform team starts automating common requests.
-
+```
 Developer
     |
     v
@@ -380,7 +380,7 @@ Terraform
     |
     v
 Cloud
-
+```
 The first capabilities are usually predictable:
 
 subscriptions, accounts, and projects
@@ -417,7 +417,7 @@ the question becomes:
 How do we give developers a supported way to ship an application?
 
 Now the IDP starts connecting systems like:
-
+```
 Git
  |
  v
@@ -434,7 +434,7 @@ Runtime
  |
  v
 Observability
-
+```
 The platform may provide:
 
 repository templates
@@ -455,7 +455,7 @@ This is also where golden paths become important.
 Instead of giving developers twelve tools and documentation explaining how to connect them, the platform gives them a supported path through the tools.
 
 For example:
-
+```
 Create Production API
         |
         +-- Repository
@@ -467,7 +467,7 @@ Create Production API
         +-- Logging
         +-- Monitoring
         +-- Ownership Metadata
-
+```
 The developer asks for an application.
 
 The platform turns that request into the organization's known-good implementation of one.
@@ -481,7 +481,7 @@ Some organizations use Kubernetes itself as the primary platform abstraction.
 Instead of exposing cloud provider APIs directly, they expose higher-level APIs through Kubernetes.
 
 That might look like:
-
+```
 Developer
    |
    v
@@ -494,11 +494,11 @@ Platform API
    |
    v
 Cloud + Runtime
-
+```
 Now a developer may request infrastructure by creating a Kubernetes object.
 
 Something like:
-
+```yaml
 apiVersion: platform.company.io/v1
 kind: PostgresDatabase
 metadata:
@@ -506,7 +506,7 @@ metadata:
 spec:
   size: medium
   environment: production
-
+```
 What actually happens underneath that object could be complicated.
 
 It might create:
@@ -600,7 +600,7 @@ This is probably the most important thing to understand.
 Very few mature IDPs fit neatly into one category.
 
 A real enterprise implementation might look like this:
-
+```
                     Developer
                         |
                         v
@@ -625,7 +625,7 @@ A real enterprise implementation might look like this:
                     +------+------+                  v
                     |      |      |              Kubernetes
                    GCP   Azure   AWS
-
+```
 That is simultaneously:
 
 a developer portal
@@ -649,7 +649,7 @@ The catalog you are building is not just a catalog.
 Implemented properly, it starts becoming a context engine for your entire software organization.
 
 Think about what eventually gets connected to a service:
-
+```
                          Team
                            |
                            v
@@ -674,7 +674,7 @@ Infrastructure ------------+
    +-- Security
    +-- Configuration
    +-- Observability
-
+```
 At first that graph helps humans.
 
 A developer can open a service and understand who owns it, where the code lives, where it is running, whether it meets engineering standards, what infrastructure supports it, and whether it currently has an operational problem.
@@ -732,7 +732,7 @@ The IDP starts as a way for humans to find and consume engineering capabilities.
 Over time, its data model can become the semantic layer that lets agents understand those same capabilities.
 
 The relationships are the important part.
-
+```
 Service
   |
   +-- owned by --> Team
@@ -750,7 +750,7 @@ Service
   +-- affected by --> Incident
   |
   +-- governed by --> Scorecard
-
+```
 That is no longer just inventory.
 
 It is a map of how your engineering organization works.
