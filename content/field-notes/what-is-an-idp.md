@@ -55,7 +55,7 @@ An IDP is what actually makes those actions work.
 A simple version looks something like this:
 
 ```mermaid
-graph TD
+flowchart TD
     Developer --> DeveloperPortal["Developer Portal"]
 
     DeveloperPortal --> ServiceCatalog["Service Catalog"]
@@ -76,6 +76,7 @@ graph TD
     PlatformCapabilities --> SecurityPolicy["Security Policy"]
     PlatformCapabilities --> FinOps
 ```
+
 If someone clicks "Create GCP Project" in a portal, the portal did not create the project.
 
 Something behind it did.
