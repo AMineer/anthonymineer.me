@@ -54,30 +54,27 @@ An IDP is what actually makes those actions work.
 
 A simple version looks something like this:
 
-```text
-Developer
-   |
-   v
-Developer Portal
-   |
-   +-- Service Catalog
-   +-- Documentation
-   +-- Scorecards
-   +-- Self-Service Actions
-   |
-   v
-Platform Capabilities
-   |
-   +-- Git
-   +-- CI/CD
-   +-- Terraform
-   +-- Kubernetes
-   +-- Cloud APIs
-   +-- GitOps
-   +-- Secrets
-   +-- Observability
-   +-- Security Policy
-   +-- FinOps
+```mermaid
+graph TD
+    Developer --> DeveloperPortal["Developer Portal"]
+
+    DeveloperPortal --> ServiceCatalog["Service Catalog"]
+    DeveloperPortal --> Documentation
+    DeveloperPortal --> Scorecards
+    DeveloperPortal --> SelfService["Self-Service Actions"]
+
+    DeveloperPortal --> PlatformCapabilities["Platform Capabilities"]
+
+    PlatformCapabilities --> Git
+    PlatformCapabilities --> CICD["CI/CD"]
+    PlatformCapabilities --> Terraform
+    PlatformCapabilities --> Kubernetes
+    PlatformCapabilities --> CloudAPIs["Cloud APIs"]
+    PlatformCapabilities --> GitOps
+    PlatformCapabilities --> Secrets
+    PlatformCapabilities --> Observability
+    PlatformCapabilities --> SecurityPolicy["Security Policy"]
+    PlatformCapabilities --> FinOps
 ```
 If someone clicks "Create GCP Project" in a portal, the portal did not create the project.
 
@@ -155,29 +152,19 @@ Your organization may choose something different.
 The exact sentence matters less than agreeing on it.
 
 Once that definition exists, the rest of the model starts getting much cleaner:
-```
-Team
-  |
-  v
-Service
-  |
-  +-- Repository
-  |
-  +-- API
-  |
-  +-- Pipeline
-  |
-  +-- Deployment
-  |
-  +-- Workload
-  |
-  +-- Infrastructure
-  |
-  +-- Incident
-  |
-  +-- Jira Work
-  |
-  +-- Documentation
+```mermaid
+graph TD
+    Team --> Service
+
+    Service --> Repository
+    Service --> API
+    Service --> Pipeline
+    Service --> Deployment
+    Service --> Workload
+    Service --> Infrastructure
+    Service --> Incident
+    Service --> JiraWork["Jira Work"]
+    Service --> Documentation
 ```
 Now a repository is not a service.
 
@@ -600,31 +587,25 @@ This is probably the most important thing to understand.
 Very few mature IDPs fit neatly into one category.
 
 A real enterprise implementation might look like this:
-```
-                    Developer
-                        |
-                        v
-                     Portal
-                        |
-        +---------------+---------------+
-        |               |               |
-        v               v               v
-     Catalog        Scorecards     Self-Service
-                                        |
-                                        v
-                                      Git
-                                        |
-                                        v
-                                    GitLab CI
-                                        |
-                           +------------+------------+
-                           |                         |
-                           v                         v
-                       Terraform                  Argo CD
-                           |                         |
-                    +------+------+                  v
-                    |      |      |              Kubernetes
-                   GCP   Azure   AWS
+```mermaid
+graph TD
+    Developer --> Portal
+
+    Portal --> Catalog
+    Portal --> Scorecards
+    Portal --> SelfService["Self-Service"]
+
+    SelfService --> Git
+    Git --> GitLabCI["GitLab CI"]
+
+    GitLabCI --> Terraform
+    GitLabCI --> ArgoCD["Argo CD"]
+
+    Terraform --> GCP
+    Terraform --> Azure
+    Terraform --> AWS
+
+    ArgoCD --> Kubernetes
 ```
 That is simultaneously:
 
@@ -649,31 +630,31 @@ The catalog you are building is not just a catalog.
 Implemented properly, it starts becoming a context engine for your entire software organization.
 
 Think about what eventually gets connected to a service:
-```
-                         Team
-                           |
-                           v
-Repository ------------> Service <------------- Documentation
-   |                       |                         |
-   v                       |                         |
-Pull Requests              +----> Dependencies      |
-   |                       |                         |
-   v                       +----> APIs               |
-Pipeline                   |                         |
-   |                       +----> Incidents <--------+
-   v                       |
-Deployment ----------------+
-   |                       |
-   v                       +----> Jira Work
-Workload                   |
-   |                       +----> Scorecards
-   v                       |
-Infrastructure ------------+
-   |
-   +-- Cost
-   +-- Security
-   +-- Configuration
-   +-- Observability
+```mermaid
+graph TD
+    Team --> Service
+    Repository --> Service
+    Documentation --> Service
+
+    Repository --> PullRequests["Pull Requests"]
+    PullRequests --> Pipeline
+    Pipeline --> Deployment
+    Deployment --> Service
+    Deployment --> Workload
+    Workload --> Infrastructure
+    Infrastructure --> Service
+
+    Service --> Dependencies
+    Service --> APIs
+    Service --> Incidents
+    Documentation --> Incidents
+    Service --> JiraWork["Jira Work"]
+    Service --> Scorecards
+
+    Infrastructure --> Cost
+    Infrastructure --> Security
+    Infrastructure --> Configuration
+    Infrastructure --> Observability
 ```
 At first that graph helps humans.
 
@@ -732,24 +713,16 @@ The IDP starts as a way for humans to find and consume engineering capabilities.
 Over time, its data model can become the semantic layer that lets agents understand those same capabilities.
 
 The relationships are the important part.
-```
-Service
-  |
-  +-- owned by --> Team
-  |
-  +-- built from --> Repository
-  |
-  +-- deployed by --> Argo Application
-  |
-  +-- runs as --> Workload
-  |
-  +-- depends on --> Database
-  |
-  +-- monitored by --> Dashboard
-  |
-  +-- affected by --> Incident
-  |
-  +-- governed by --> Scorecard
+```mermaid
+graph TD
+    Service -->|owned by| Team
+    Service -->|built from| Repository
+    Service -->|deployed by| ArgoApplication["Argo Application"]
+    Service -->|runs as| Workload
+    Service -->|depends on| Database
+    Service -->|monitored by| Dashboard
+    Service -->|affected by| Incident
+    Service -->|governed by| Scorecard
 ```
 That is no longer just inventory.
 
